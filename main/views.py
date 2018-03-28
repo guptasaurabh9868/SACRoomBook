@@ -60,28 +60,26 @@ def registration(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=True)
-            user.is_active = True
-            user.save()
-
+            USER = form.save(commit=True)
+            USER.is_active = True
+            USER.save()
             from_mail = settings.EMAIL_HOST_USER
-            to_list = ['guptasaurabh9868@gmail.com', settings.EMAIL_HOST_USER ]
+            to_list = ['saurabh.gupta.17@iitb.ac.in', settings.EMAIL_HOST_USER ]
 
             current_site = get_current_site(request)
-            subject = 'Approve '+ user.username +' SACRoom Booking Account'
+            subject = 'Approve '+ USER.username +' SACRoom Booking Account'
             message = render_to_string('account_verification_email.html', {
-                'user': user,
+                'user': USER,
                 'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': account_verification_token.make_token(user),
+                'uid': urlsafe_base64_encode(force_bytes(USER.pk)),
+                'token': account_verification_token.make_token(USER),
             })
-            login(request, user)
+            login(request, USER)
             send_mail(subject,message, from_mail, to_list, fail_silently=True)
 
             return redirect('account_activation_sent')
     else:
         form = SignUpForm()
-        print("Here")
     return render(request, 'registration.html', {'form': form})
 
 def account_activation_sent(request):

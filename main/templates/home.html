@@ -8,7 +8,7 @@
             <a href="{% url 'logout' %}" name="logout_buuton" class="btn btn-primary">logout</a>
 </div>
 <div class="col text-right">
-            <a href="{% url 'my_bookings'%}" class="btn btn-deep-orange" role="button">My Bookings</a>
+            <a href="{% url 'my_bookings'%}" class="btn btn-deep-orange" role="button">Bookings</a>
     </div>
 </div>
 
@@ -17,7 +17,7 @@
     <div class="col">
         <h2>Welcome, {{ user.username }}</h2>
         <p>Your Account is Verified by the GSEC.</p>
-
+        
         {% block booking_form %}
         {% endblock %}
 

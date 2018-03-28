@@ -30,8 +30,10 @@
         {% empty %}
         <div class="row text-center">
             <div class="col">
-                <p> NO, Bookings For you.</p>
+                <p> NO, Bookings.</p>
+                {% if not user.is_staff %}
                 <a href="/booking/" class="btn btn-success">Book Now</a>
+                {% endif %}
             </div>
         </div>  
         {% endfor %}

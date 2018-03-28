@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.template.loader import render_to_string
 
 from datetime import datetime
 import dateutil.parser 
@@ -56,18 +58,29 @@ def display_requests(request):
     return render(request,'display_my_bookings.html',{'my_bookings':my_bookings, 'verified':request.user.profile.email_confirmed})
 
 def delete_request(request, id):
-    request = Booking.objects.get(id=id)
-    request.delete()
+    booking = Booking.objects.get(id=id)
+    if request.user.is_staff:
+        from_mail = settings.EMAIL_HOST_USER
+        to_list = [ booking.user.email ]
+        subject = "Your Booking is Deleted."
+        message = render_to_string('booking_deleted.html', {
+                    'user': booking.user,
+                })
+        print(from_mail, to_list, subject, message)
+        send_mail(subject,message, from_mail, to_list, fail_silently=True)
+    booking.delete()
     return HttpResponseRedirect('/my_bookings/')
 
 def approved(request, id):
     booking = Booking.objects.get(id=id)
     booking.Approved = True
+    booking.Rejected = False
     booking.save()
     return HttpResponseRedirect('/my_bookings/')
 
 def rejected(request, id):
     booking = Booking.objects.get(id=id)
     booking.Rejected = True
+    booking.Approved = False
     booking.save()
     return HttpResponseRedirect('/my_bookings/')
