@@ -1,0 +1,15 @@
+{% autoescape off %}
+Hi General Secrectary,
+
+Person With Following Details want to Register with SAC Room Booking Portal.
+UserName : {{ user.username }}
+EmailID : {{ user.email }}
+
+To Verify the account, Click on this link:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Note: By clicking On this link, you verify that the details above mentioned are correct and this Person can access the SAC Room Booking Portal.
+If you find any discrepencies, please contact the person by sending mail to {{ user.email }}.
+
+{% endautoescape %}

@@ -1,0 +1,40 @@
+{% extends 'home.html' %}
+{% block display_requests %}
+<div class="container">
+        {% for booking in my_bookings %}
+        <div class="row" style="
+                            border: solid;
+                            border-color:  wheat;
+                            padding-top: 10px;">
+            <div class="col-md-9">
+                    {% if user.is_staff %}
+                <p>Requested By: {{ booking.user }}</p>
+                {% endif %}
+                <p>Room: {{ booking.Room_no }}</p>
+                <p>From:  {{ booking.Booking_start }}</p>
+                <p>To: {{ booking.Booking_end}}</p>
+                <p>Status: {% if booking.Approved %} Approved {% elif booking.Rejected %} Rejected {% else %} Pending {% endif %}</p>
+            </div>
+            {% if user.is_staff %}
+            <div class="col-md-1">
+                    <a href="/approved/{{ booking.id }}" class="btn btn-primary" name="approved" style="margin-top: 48px;"><i class="material-icons">done</i></a>
+                </div>
+                <div class="col-md-1">
+                        <a href="/rejected/{{ booking.id }}" class="btn btn-secondary" name="rejected" style="margin-top: 48px;"><i class="material-icons">clear</i></a>
+                    </div>
+            {% endif %}
+            <div class="col-md-1">
+                <a href="/delete/{{ booking.id }}" class="btn btn-danger" name="delete" style="margin-top: 48px;"><i class="material-icons">delete</i></a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="row text-center">
+            <div class="col">
+                <p> NO, Bookings For you.</p>
+                <a href="/booking/" class="btn btn-success">Book Now</a>
+            </div>
+        </div>  
+        {% endfor %}
+    
+</div>
+{% endblock %}

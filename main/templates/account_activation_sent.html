@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block registration %}
+
+{% if user.is_authenticated  %}
+<div class="row text-left">
+  <div class="col">
+    <a href="{% url 'logout' %}" class="btn btn-primary">logout</a>
+  </div>
+</div>
+{% endif %}
+<div class="row text-center">
+  <div class="col">
+   <p>Please Wait for General Secretary to Verify your Account.<br>If its 'URGENT' or
+     Its been a long time, your Account verification is pending, please Contact the General Secretary.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'home.html' %}
+
+{% block booking_form %}
+<div class="row">
+    <div class="col">
+        <form  method="POST" class="post-form" action="/booking/"> {% csrf_token %}
+            <p> {{ form.Room_no.label_tag }}
+                {{ form.Room_no }}</p>
+            <p><label for="id_Booking_start">Booking start:</label> <input type="datetime-local" name="Booking_start" id="id_Booking_start" required=""></p>
+            <p><label for="id_Booking_end">Booking end:</label> <input type="datetime-local" name="Booking_end" id="id_Booking_end" required=""></p>
+            <button type="submit" class="save btn btn-default">Save</button>
+        </form>
+    </div>
+</div>
+<div class="row text-center">
+    <div class="col">
+            {% if wrong_date_selection %}
+            <p style="color:  red;">End Date Can't be Earlier than Start Date.</p>
+            {% endif %}
+            {%  if clash %}
+            <p style="color: red;">
+                Your Booking Dates are Clashing with {{ booking.user.profile }} 's Event.<br> Please Select Other Dates.
+            </p>
+            {% endif %}
+            {% if request_made %}
+            <p style="color:  green;">
+                Your Request has been made successfully. Please wait for SAC Admin/GSEC to approve your Request.
+            </p>
+            {% endif %}
+    </div>
+</div>
+
+{% endblock %}
