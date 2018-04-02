@@ -64,7 +64,7 @@ def registration(request):
             USER.is_active = True
             USER.save()
             from_mail = settings.EMAIL_HOST_USER
-            to_list = ['saurabh.gupta.17@iitb.ac.in', settings.EMAIL_HOST_USER ]
+            to_list = [settings.GSEC_EMAIL]
 
             current_site = get_current_site(request)
             subject = 'Approve '+ USER.username +' SACRoom Booking Account'
