@@ -26,16 +26,11 @@ def booking(request):
 
         print(room_no, booking_start, booking_end)
         
-        if booking_start > booking_end :
+        if (booking_start > booking_end) or (booking_start < utc.localize(datetime.now()) or booking_end < utc.localize(datetime.now())):
             wrong_date_selection = True
             print("Wrong Date Selected.")
             return render(request,'booking.html',{'verified':request.user.profile.email_confirmed, 'wrong_date_selection':wrong_date_selection, 'form' : form })
         else:
-            for booking in Booking.objects.filter(Room_no=room_no):
-                if (booking_start >= booking.Booking_start and booking_start <= booking.Booking_end ) or ( booking_end >= booking.Booking_start and booking_end <= booking.Booking_end ) or(booking_start < booking.Booking_start and booking_end > booking.Booking_end):
-                    clash = True
-                    return render(request,'booking.html',{'verified':request.user.profile.email_confirmed, 'booking':booking, 'clash': clash, 'form' : form })
-
             booking  = Booking(Room_no=Room.objects.get(pk=room_no), Booking_start=booking_start, Booking_end=booking_end, user=request.user.profile)
             booking.save()
             request_made = True
@@ -61,7 +56,7 @@ def delete_request(request, id):
     booking = Booking.objects.get(id=id)
     if request.user.is_staff:
         from_mail = settings.EMAIL_HOST_USER
-        to_list = [ booking.user.email ]
+        to_list = [ booking.user.user.email ]
         subject = "Your Booking is Deleted."
         message = render_to_string('booking_deleted.html', {
                     'user': booking.user,
@@ -73,8 +68,24 @@ def delete_request(request, id):
 
 def approved(request, id):
     booking = Booking.objects.get(id=id)
+    all_bookings = Booking.objects.all()
+    for book in Booking.objects.filter(Room_no=booking.Room_no,Approved=True).exclude():
+        if (booking.Booking_start >= book.Booking_start and booking.Booking_start <= book.Booking_end ) or ( booking.Booking_end >= book.Booking_start and booking.Booking_end <= book.Booking_end ) or(booking.Booking_start < book.Booking_start and booking.Booking_end > book.Booking_end):
+            if booking.id == book.id:
+                continue
+            clash = True
+            return render(request,'display_all_bookings.html',{'verified':request.user.profile.email_confirmed, 'clash_booking':booking, 'clash': clash, 'all_bookings' : all_bookings })
     booking.Approved = True
     booking.Rejected = False
+    if request.user.is_staff:
+        from_mail = settings.EMAIL_HOST_USER
+        to_list = [ booking.user.user.email ]
+        subject = "Your Booking is Approved."
+        message = render_to_string('booking_approved.html', {
+                    'user': booking.user,
+                })
+        print(from_mail, to_list, subject, message)
+        send_mail(subject,message, from_mail, to_list, fail_silently=True)
     booking.save()
     return HttpResponseRedirect('/my_bookings/')
 
@@ -82,5 +93,21 @@ def rejected(request, id):
     booking = Booking.objects.get(id=id)
     booking.Rejected = True
     booking.Approved = False
+    if request.user.is_staff:
+        from_mail = settings.EMAIL_HOST_USER
+        to_list = [ booking.user.user.email ]
+        subject = "Your Booking is Rejected."
+        message = render_to_string('booking_rejected.html', {
+                    'user': booking.user,
+                })
+        print(from_mail, to_list, subject, message)
+        send_mail(subject,message, from_mail, to_list, fail_silently=True)
     booking.save()
     return HttpResponseRedirect('/my_bookings/')
+
+def display_all_requests(request):
+    if request.user.is_staff:
+        all_bookings = Booking.objects.all()
+    else:
+        all_bookings = Booking.objects.filter(Approved=True)
+    return render(request,'display_all_bookings.html',{'all_bookings':all_bookings, 'verified':request.user.profile.email_confirmed})
